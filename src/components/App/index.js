@@ -3,20 +3,36 @@ import { Fragment, useState } from 'preact/compat';
 import _ from 'lodash';
 import SearchBox from '../SearchBox';
 import { getPage } from '../../wikiAPI';
+import localforage from 'localforage';
+
+const maxTTL = 10000;
+const needsUpdate = (pageData) => {
+  if (!pageData || !pageData.updated) {
+    return true;
+  }
+  const diff = new Date() - pageData.updated;
+  return diff > maxTTL;
+};
 
 const App = () => {
   const [pageData, setPageData] = useState(null);
   const onPageSelected = async (pageTitle) => {
     console.log("Page selected: ", pageTitle);
-    const pageContent = await getPage(pageTitle);
-    console.log("Page loded: ", pageContent);
-    setPageData({
-      title: pageTitle,
-      price: pageContent.info.price,
-      img: pageContent.mainImage,
-      url: pageContent.url,
-      content: pageContent.content
-    })
+    let pageData = await localforage.getItem(pageTitle);
+    if (needsUpdate(pageData)) {
+      const pageContent = await getPage(pageTitle);
+      console.log("Page loded: ", pageContent);
+      pageData = {
+        title: pageTitle,
+        price: pageContent.info.price,
+        img: pageContent.mainImage,
+        url: pageContent.url,
+        content: pageContent.content,
+        updated: new Date()
+      };
+      await localforage.setItem(pageTitle, pageData);
+    }
+    setPageData(pageData);
   };
   return (
     <>
