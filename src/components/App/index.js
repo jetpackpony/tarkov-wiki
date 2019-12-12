@@ -5,7 +5,8 @@ import SearchBox from '../SearchBox';
 import { getPage } from '../../wikiAPI';
 import localforage from 'localforage';
 
-const maxTTL = 10000;
+// const maxTTL = 10000;
+const maxTTL = 1000 * 60 * 60 * 24;
 const needsUpdate = (pageData) => {
   if (!pageData || !pageData.updated) {
     return true;
