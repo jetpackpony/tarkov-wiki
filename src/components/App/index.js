@@ -21,6 +21,7 @@ const App = () => {
     console.log("Page selected: ", pageTitle);
     let pageData = await localforage.getItem(pageTitle);
     if (needsUpdate(pageData)) {
+      setPageData(null);
       const pageContent = await getPage(pageTitle);
       console.log("Page loded: ", pageContent);
       pageData = {
@@ -37,7 +38,9 @@ const App = () => {
   };
   return (
     <>
-      <SearchBox onPageSelected={onPageSelected} />
+      <SearchBox
+        onPageSelected={onPageSelected}
+      />
       <div id="item-details">
         {
           (pageData)
