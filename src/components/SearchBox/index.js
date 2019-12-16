@@ -43,7 +43,7 @@ const SearchBox = ({ onPageSelected }) => {
               <ul>
                 {
                   searchResults.map((res) => (
-                    <li onClick={() => onPageSelected(res)}>{res}</li>
+                    <li onClick={() => onPageSelected(res.pageId)}>{res.title}</li>
                   ))
                 }
               </ul>

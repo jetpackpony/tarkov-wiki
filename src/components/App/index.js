@@ -17,22 +17,23 @@ const needsUpdate = (pageData) => {
 
 const App = () => {
   const [pageData, setPageData] = useState(null);
-  const onPageSelected = async (pageTitle) => {
-    console.log("Page selected: ", pageTitle);
-    let pageData = await localforage.getItem(pageTitle);
+  const onPageSelected = async (pageId) => {
+    console.log("Page selected: ", pageId);
+    let pageData = await localforage.getItem(pageId);
     if (needsUpdate(pageData)) {
       setPageData(null);
-      const pageContent = await getPage(pageTitle);
+      const pageContent = await getPage(pageId);
       console.log("Page loded: ", pageContent);
       pageData = {
-        title: pageTitle,
-        price: pageContent.info.price,
-        img: pageContent.mainImage,
-        url: pageContent.url,
-        content: pageContent.content,
+        title: pageContent.title,
+        text: pageContent.text,
+        // price: pageContent.info.price,
+        // img: pageContent.mainImage,
+        // url: pageContent.url,
+        // content: pageContent.content,
         updated: new Date()
       };
-      await localforage.setItem(pageTitle, pageData);
+      await localforage.setItem(pageId, pageData);
     }
     setPageData(pageData);
   };
@@ -46,8 +47,9 @@ const App = () => {
           (pageData)
             ? (
               <>
-                <h1><a href={pageData.url}>{pageData.title}</a></h1>
-                <img src={pageData.img} />
+                <h1>{pageData.title}</h1>
+                <div dangerouslySetInnerHTML={{__html: pageData.text}}></div>
+                {/* <img src={pageData.img} />
                 <div>Price: {pageData.price}</div>
                 {
                   pageData.content.map((section) => (
@@ -56,7 +58,7 @@ const App = () => {
                       <p>{section.content}</p>
                     </>
                   ))
-                }
+                } */}
               </>
             )
             : null

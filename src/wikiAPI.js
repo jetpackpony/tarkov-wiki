@@ -1,40 +1,47 @@
-import wiki from 'wikijs';
 import _ from 'lodash';
+import buildUrl from 'build-url';
 
-const w = wiki({
-  apiUrl: 'https://escapefromtarkov.gamepedia.com/api.php',
-  origin: "*"
-});
+const API_URL = "https://escapefromtarkov.gamepedia.com/";
 
 export const search = async (term, limit = 10) => {
-  //return w.search(term, limit);
-  return Promise.resolve(["Damaged hard drive", "Dogtag"]);
+  const req = buildUrl(API_URL, {
+    path: 'api.php',
+    queryParams: {
+      format: "json",
+      origin: "*",
+      action: "query",
+      list: "search",
+      srsearch: term,
+      srlimit: limit
+    }
+  });
+  const res = await fetch(req);
+  const json = await res.json();
+  const out = json.query.search.map((r) => ({
+    title: r.title,
+    pageId: r.pageid
+  }));
+  return out;
 };
 
-export const getPage = async (title) => {
-  const page = await w.page(title);
-  const promises = {
-    backlinks: page.backlinks(),
-    categories: page.categories(),
-    content: page.content(),
-    coordinates: page.coordinates(),
-    // // externalLinks: page.externalLinks(),   this one not working
-    fullInfo: page.fullInfo(),
-    html: page.html(),
-    images: page.images(),
-    info: page.info(),
-    langlinks: page.langlinks(),
-    links: page.links(),
-    mainImage: page.mainImage(),
-    raw: page.raw,
-    rawContent: page.rawContent(),
-    rawImages: page.rawImages(),
-    rawInfo: page.rawInfo(),
-    references: page.references(),
-    sections: page.sections(),
-    summary: page.summary(),
-    tables: page.tables(),
-    url: page.url(),
+export const getPage = async (pageId) => {
+  const req = buildUrl(API_URL, {
+    path: 'api.php',
+    queryParams: {
+      format: "json",
+      origin: "*",
+      action: "parse",
+      disabletoc: "true",
+      prop: "text|displaytitle",
+      mobileformat: "true",
+      pageid: pageId
+    }
+  });
+  const res = await fetch(req);
+  const json = await res.json();
+  const out = {
+    title: json.parse.displaytitle,
+    text: json.parse.text["*"]
   };
-  return _.zipObject(_.keys(promises), await Promise.all(_.values(promises)));
+  return out;
 };
