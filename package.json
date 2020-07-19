@@ -12,7 +12,7 @@
   "dependencies": {
     "build-url": "^2.0.0",
     "localforage": "^1.7.3",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "preact": "^10.1.0",
     "wikijs": "^6.0.1"
   },
